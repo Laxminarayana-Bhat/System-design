@@ -1,4 +1,4 @@
-package org.example;
+package org.example.shortner;
 
 public class UrlShortener {
     private static final char[] BASE52 =
