@@ -1,47 +1,49 @@
 package org.example;
 
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class Main {
+@SpringBootApplication
+public class Main implements CommandLineRunner {
     public static void main(String[] args) {
-        int[] nums = {0, 1, 0, 1, 0, 0};
-        //op 6
-        System.out.println(maxSubArrayZero(nums));
+        SpringApplication.run(Main.class, args);
+    }
+
+    int limit = 10;
+    long millis = 60000L;//1min
+
+    Map<String, Deque<Long>> trackRequests = new ConcurrentHashMap<>();
+
+    @Override
+    public void run(String... args) throws Exception {
+
 
     }
 
-    public static int maxSubArrayZero(int[] nums) {
-        int max = 0;
-        int sum = 0;
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(0, -1);//required for all the subarrays starting with 0 index, as sum will be 0, we need to calculate i- (-1) so it will give correct value
-
-        for (int i = 0; i < nums.length; i++) { 
-            sum += (nums[i] == 0) ? -1 : 1;
-            if (map.containsKey(sum)) {
-                max = Math.max(max, i - map.get(sum));
-            }
-            if (map.containsKey(sum - 2)) {
-                max = Math.max(max, i - map.get(sum - 2));
-            }
-            if (map.containsKey(sum + 2)) {
-                max = Math.max(max, i - map.get(sum + 2));
-                System.out.println(max + "--max");
-            }
-            map.putIfAbsent(sum, i);
+    boolean allow(String ipAddress) {
+        long now = System.currentTimeMillis();
+        if (!trackRequests.containsKey(ipAddress)) {
+            trackRequests.put(ipAddress, new ArrayDeque<>());
         }
-        return max;
+        Deque<Long> dq = trackRequests.get(ipAddress);
+
+        synchronized (dq) {
+            while (!dq.isEmpty() && now - dq.peekFirst() > millis) {
+                dq.pollFirst();
+            }
+            if (dq.size() <= limit) {
+                dq.add(now);
+                return true;
+            }
+            return false;
+        }
+
     }
-
-    //nums = [1, 0, 1, 1, 0, 0]
-    //
-    //Mapping:
-    //1 → '('
-    //0 → ')'
-    //
-    //Sequence:
-    //() (())
-
-
 }

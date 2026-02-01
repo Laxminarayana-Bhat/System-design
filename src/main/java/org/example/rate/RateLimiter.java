@@ -1,4 +1,4 @@
-package org.example.ratelimiter;
+package org.example.rate;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;

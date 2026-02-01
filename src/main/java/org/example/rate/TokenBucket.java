@@ -1,4 +1,4 @@
-package org.example.ratelimiter;
+package org.example.rate;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
