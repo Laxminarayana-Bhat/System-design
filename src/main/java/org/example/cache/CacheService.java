@@ -4,11 +4,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.function.ToLongFunction;
 
 public class CacheService {
 
-    Map<String, CacheEntry> cache = new HashMap<>();
+    Map<String, CacheEntry> cacheMap = new HashMap<>();
 
     PriorityQueue<CacheEntry> ttlQueue = new PriorityQueue<>(Comparator.comparingLong(e -> e.ttl));
 
@@ -16,14 +15,14 @@ public class CacheService {
     public String get(String key) {
         evict();
 
-        return cache.get(key) == null ? null : cache.get(key).value;
+        return cacheMap.get(key) == null ? null : cacheMap.get(key).value;
     }
 
     public void put(String k, String v, Long ttl) {
         long expiry = System.currentTimeMillis() + ttl;
 
         CacheEntry cacheEntry = new CacheEntry(k, v, ttl);
-        cache.put(k, cacheEntry);
+        cacheMap.put(k, cacheEntry);
         ttlQueue.offer(cacheEntry);
     }
 
@@ -33,9 +32,9 @@ public class CacheService {
             CacheEntry expired = ttlQueue.poll();
 
             // IMPORTANT: ensure it’s the latest entry
-            CacheEntry currentEntry = cache.get(expired.key);
+            CacheEntry currentEntry = cacheMap.get(expired.key);
             if (currentEntry == expired) {
-                cache.remove(expired.key);
+                cacheMap.remove(expired.key);
             }
         }
     }
