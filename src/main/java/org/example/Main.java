@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.sort.Bubble;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,34 +18,13 @@ public class Main implements CommandLineRunner {
         SpringApplication.run(Main.class, args);
     }
 
-    int limit = 10;
-    long millis = 60000L;//1min
-
-    Map<String, Deque<Long>> trackRequests = new ConcurrentHashMap<>();
+    @Autowired
+    Bubble bubble;
 
     @Override
     public void run(String... args) throws Exception {
-
-
-    }
-
-    boolean allow(String ipAddress) {
-        long now = System.currentTimeMillis();
-        if (!trackRequests.containsKey(ipAddress)) {
-            trackRequests.put(ipAddress, new ArrayDeque<>());
-        }
-        Deque<Long> dq = trackRequests.get(ipAddress);
-
-        synchronized (dq) {
-            while (!dq.isEmpty() && now - dq.peekFirst() > millis) {
-                dq.pollFirst();
-            }
-            if (dq.size() <= limit) {
-                dq.add(now);
-                return true;
-            }
-            return false;
-        }
+bubble.bubbleSort(new int[]{3,5,7,1,2});
 
     }
-}
+
+    }
